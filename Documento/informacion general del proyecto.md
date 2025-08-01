@@ -160,39 +160,7 @@ Cambia el `IMAGE_NAME` a `auth-backend` y agrega:
 Archivo: `.github/workflows/deploy-frontend.yml`
 
 ```yaml
-name: Deploy Frontend
-
-on:
-  push:
-    branches: [main]
-
-env:
-  PROJECT_ID: your-gcp-project-id
-  BUCKET_NAME: your-gcp-project-id-heru-frontend
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Auth GCP
-      uses: google-github-actions/auth@v2
-      with:
-        credentials_json: '${{ secrets.GCP_SA_KEY }}'
-
-    - name: Setup gcloud
-      uses: google-github-actions/setup-gcloud@v2
-
-    - name: Build static site
-      run: |
-        npm install
-        npm run build
-        npm run export
-
-    - name: Deploy to GCS
-      run: |
-        gsutil -m rsync -r -c -d out gs://${{ env.BUCKET_NAME }}
+ npm run dev
 ```
 
 ---
