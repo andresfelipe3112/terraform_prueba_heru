@@ -1,0 +1,58 @@
+# Archivo: .github/workflows/deploy-product.yml
+
+name: Deploy Product Backend to GCP
+
+on:
+  push:
+    branches:
+    - main
+
+env:
+  PROJECT_ID: your-gcp-project-id
+  GCP_REGION: us-central1
+  IMAGE_NAME: product-backend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: 'Authenticate to Google Cloud'
+      id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v2'
+
+    - name: 'Set up Docker'
+      uses: docker/setup-docker@v2
+
+    - name: 'Configure Docker for GCP Artifact Registry'
+      run: gcloud auth configure-docker
+
+    # === Despliegue del Backend (Cloud Run y Cloud SQL) ===
+
+    - name: Build and push Docker image
+      run: |
+        docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }} .
+        docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}
+
+    - name: Deploy to Cloud Run
+      uses: google-github-actions/deploy-cloudrun@v2
+      with:
+        service: ${{ env.IMAGE_NAME }} # El nombre del servicio en Cloud Run
+        region: ${{ env.GCP_REGION }}
+        image: gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}
+        env_vars: |
+          # Estas variables son cruciales para el backend de productos
+          DATABASE_URL=postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}
+          # Asegúrate de que las variables de la base de datos se configuran aquí
