@@ -1,5 +1,3 @@
-Gracias por el contexto. Lo estás haciendo muy bien. Aquí tienes una **sección mejorada y clara de “Despliegue paso a paso con CI/CD en GCP usando GitHub Actions”**. Puedes reemplazar directamente la sección `🚀 Proceso de Despliegue (Paso a Paso)` por esto en tu documento, para mejorar su claridad y profesionalismo.
-
 ---
 
 ## 🚀 Despliegue Paso a Paso con CI/CD en Google Cloud Platform (GCP)
